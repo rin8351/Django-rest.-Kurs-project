@@ -1,0 +1,21 @@
+{% extends "postt/base.html" %}
+
+{% block content %}
+<h2>Update order</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {% for f in form %}
+    <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}
+    {% endfor %}
+    <br>
+    <br>
+    <input type="submit" class="c-button2" value="Update" />
+    <input type="submit" class="c-button" name="cancel" value="Cancel" /> 
+</form>
+
+
+{% endblock content %}
+
+</body>
+</html>

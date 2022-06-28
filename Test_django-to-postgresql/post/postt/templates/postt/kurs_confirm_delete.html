@@ -1,0 +1,14 @@
+{% extends "postt/base.html" %}
+
+{% block content %}
+<h2>Delete order</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <input type="submit" class="c-button2" value="Yes, delete" />
+    <input type="submit" class="c-button" name="cancel" value="No, cancel" /> 
+
+</form>
+
+{% endblock content %}
