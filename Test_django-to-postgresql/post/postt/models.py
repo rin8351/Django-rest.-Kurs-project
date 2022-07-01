@@ -1,10 +1,20 @@
+from enum import auto
 from django.db import models
 from django.urls import reverse
-from django.core.files import File
 import requests
 import xml.etree.ElementTree as ET
 import datetime
 
+
+class valute(models.Model):
+    date = models.DateField()
+    krs = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('valute')
 
 class kurs(models.Model):
     number = models.IntegerField()
@@ -19,27 +29,19 @@ class kurs(models.Model):
         return reverse('kurs')
 
     # Функция записи рублевой стоимости в базу данных
-    # Сначала считывается текстовый файл с курсами валют
     def save(self, *args, **kwargs):
-        kurs_d = {}
-        with open('k.txt', 'r') as f:
-            myfile = File(f)
-            for line in myfile:
-                key, value = line.split()
-                kurs_d[key] = value
-        myfile.close()
-        d = self.date.strftime('%d/%m/%Y')
-        # Если курса валют нет в текстовом файле, новый 
-        # курс берется из базы данных ЦБ
-        if d not in kurs_d:
-            kurs_d[d] = self.dobavlenie_kursa(self.get_root(d))
-        new_kurs=float(kurs_d[d].replace(',', '.'))
+        kurs_d = valute.objects.all()
+        d = self.date
+        # Если курса валют на нужную дату нет - 
+        # берем его из базы данных ЦБРФ
+        if d not in [k.date for k in kurs_d]:
+            root = self.get_root(d)
+            new_kurs = self.dobavlenie_kursa(root)
+            valute.objects.create(date=d, krs=new_kurs)
+        else:
+            new_kurs = valute.objects.get(date=d).krs
+        valute.objects.filter(date=d).update(krs=new_kurs)
         self.price_rub = round(self.price_dol*new_kurs, 2)
-        with open('k.txt', 'w') as f:
-            for key, value in kurs_d.items():
-                f.write(key + ' ' + value + '\n')
-        myfile.closed
-
         super(kurs,self).save(*args, **kwargs)
 
     def get_root(self,d):
