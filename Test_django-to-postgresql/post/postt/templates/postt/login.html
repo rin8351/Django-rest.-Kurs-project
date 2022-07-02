@@ -1,0 +1,24 @@
+{% extends "postt/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="modal">
+
+<form method="POST" >
+  {% csrf_token %}
+<h4>Авторизация на сайте</h4>
+
+<div class="form-error">{{ form.non_field_errors }}</div>
+
+  {% for f in form %}
+  <p><label class="form-label-login" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+  <div class="form-error">{{ f.errors }}</div>
+  {% endfor %}
+
+    <button class="c-button" type="submit" >Log in</button>
+</form>
+
+</div>
+
+    {% endblock content %}
