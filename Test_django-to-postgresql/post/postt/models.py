@@ -22,6 +22,7 @@ class kurs(models.Model):
     date = models.DateField()
     price_rub = models.IntegerField(null=True, blank=True)
 
+
     def __str__(self):
         return str(self.number)
 
@@ -37,15 +38,16 @@ class kurs(models.Model):
         if d not in [k.date for k in kurs_d]:
             root = self.get_root(d)
             new_kurs = self.dobavlenie_kursa(root)
+            new_kurs = float(new_kurs.replace(',', '.'))
             valute.objects.create(date=d, krs=new_kurs)
         else:
             new_kurs = valute.objects.get(date=d).krs
-        valute.objects.filter(date=d).update(krs=new_kurs)
         self.price_rub = round(self.price_dol*new_kurs, 2)
         super(kurs,self).save(*args, **kwargs)
 
     def get_root(self,d):
-        url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req='+d
+        d_url = d.strftime("%d/%m/%Y")
+        url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req='+d_url
         response = requests.get(url)
         root = ET.fromstring(response.content)
         return root
