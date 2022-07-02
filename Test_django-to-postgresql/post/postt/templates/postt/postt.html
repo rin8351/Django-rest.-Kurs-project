@@ -1,9 +1,17 @@
 {% extends "postt/base.html" %}
+{% load postt_tags %}
 
 {% block content %}
+
+<br>
+<a href="{% url 'logout' %}" class="button">Logout</a>
+<br>
 <h2>Add new order</h2>
 
-<form  method="POST" >
+{% script_for_sort_table %}
+
+
+<form method="POST" >
     {% csrf_token %}
     {% for f in form %}
     <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}
@@ -11,19 +19,23 @@
 <button class="c-button" type="submit" >Submit</button>
 </form>
 
-
 <h2>Table of orders and dates of delivery</h2>
 <table class="simple-little-table" cellpadding="1" cellspacing="1">
+    <thead>
     <tr>
-        <th >Num</th>
-        <th >Number</th>
-        <th >Price_dol</th>
-        <th >Date</th>
-        <th >Price_rub</th>
+        <th width="50">№ </th>
+        <th width="120">Number</th>
+        <th width="120">Price_dol</th>
+        <th width="150">Date</th>
+        <th width="120">Price_rub</th>
+        <th width="120">For delete</th>
+        <th width="120">For update</th>
     </tr>
+</thead>
+<tbody>
     {% for p in kurs_p %}
     <tr>
-        <td>{{ p.id }}</td>
+        <td>{{ forloop.counter }}</td>
         <td>{{ p.number }}</td>
         <td>{{ p.price_dol }}</td>
         <td>{{ p.date }}</td>
@@ -32,6 +44,6 @@
         <td><a href="{% url 'update_row' p.id %}" class="button15" type="submit">Change</a></td>
     </tr>
     {% endfor %}
-</ul>
+</tbody>
         
 {% endblock content %}
